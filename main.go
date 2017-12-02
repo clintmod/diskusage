@@ -20,20 +20,12 @@ func dirList(path string) {
 
 	for _, file := range files {
 		if(!file.IsDir()) {
-			fmt.Printf("name: %s, size: %.2f KB\n", file.Name(), float64(file.Size()) / 1024)
+			var float_size, size_unit = getFileSize(file.Size())
+			fmt.Printf("name: %s, size: %.2f %v\n", file.Name(), float_size, size_unit)
 		} else {
-			var size, file_count = dirSize(path + "/" + file.Name())
-			var float_size float64 = float64(size) / 1024
-			var size_unit string = "KB"
-			if(float_size > 1024) {
-				float_size = float_size / 1024
-				size_unit = "MB"
-			}
-			if(float_size > 1024) {
-				float_size = float_size / 1024
-				size_unit = "GB"
-			}
-			fmt.Printf("name: %s, size: %.2f %s, count:%v\n", file.Name(), float_size, size_unit, file_count)
+			var size, _ = dirSize(path + "/" + file.Name())
+			var float_size, size_unit = getFileSize(size)
+			fmt.Printf("name: %s, size: %.2f %s\n", file.Name(), float_size, size_unit)
 		}
 	}
 }
@@ -52,4 +44,22 @@ func dirSize(path string)(int64, int64) {
 		log.Fatal(err)
 	}
 	return size, file_count
+}
+
+func getFileSize(size int64)(float64, string){
+	var float_size float64 = float64(size)
+	var size_unit string = "B"
+	if(float_size > 1024) {
+		float_size = float_size / 1024
+		size_unit = "KB"
+	}
+	if(float_size > 1024) {
+		float_size = float_size / 1024
+		size_unit = "MB"
+	}
+	if(float_size > 1024) {
+		float_size = float_size / 1024
+		size_unit = "GB"
+	}
+	return float_size, size_unit
 }
