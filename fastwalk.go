@@ -23,8 +23,8 @@ import (
 	"io/ioutil"
 )
 
-// traverseLink is a sentinel error for fastWalk, similar to filepath.SkipDir.
-var traverseLink = errors.New("traverse symlink, assuming target is a directory")
+// errTraverseLink is a sentinel error for fastWalk, similar to filepath.SkipDir.
+var errTraverseLink = errors.New("traverse symlink, assuming target is a directory")
 
 // fastWalk walks the file tree rooted at root, calling walkFn for
 // each file or directory in the tree, including root.
@@ -37,7 +37,7 @@ var traverseLink = errors.New("traverse symlink, assuming target is a directory"
 //     any permission bits.
 //   * multiple goroutines stat the filesystem concurrently. The provided
 //     walkFn must be safe for concurrent use.
-//   * fastWalk can follow symlinks if walkFn returns the traverseLink
+//   * fastWalk can follow symlinks if walkFn returns the errTraverseLink
 //     sentinel error. It is the walkFn's responsibility to prevent
 //     fastWalk from going into symlink cycles.
 func fastWalk(root string, walkFn func(path string, typ os.FileMode) error) error {
@@ -159,7 +159,7 @@ func (w *walker) onDirEnt(dirName, baseName string, typ os.FileMode) error {
 
 	err := w.fn(joined, typ)
 	if typ == os.ModeSymlink {
-		if err == traverseLink {
+		if err == errTraverseLink {
 			// Set callbackDone so we don't call it twice for both the
 			// symlink-as-symlink and the symlink-as-directory later:
 			w.enqueue(walkItem{dir: joined, callbackDone: true})

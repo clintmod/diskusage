@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"fmt"
 	"os"
 	"log"
 	"sync"
@@ -18,26 +17,26 @@ func dirList(path string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var float_size float64
-	var size_unit string
-	var file_name string
-	var file_path string
+	var floatSize float64
+	var sizeUnit string
+	var fileName string
+	var filePath string
 	for _, file := range files {
-		file_name = file.Name()
-		file_path = path + file_name
+		fileName = file.Name()
+		filePath = path + fileName
 		if (!file.IsDir()) {
-			float_size, size_unit = getFileSize(file.Size())
+			floatSize, sizeUnit = getFileSize(file.Size())
 		} else {
-			var size, _= dirSize(file_path)
-			float_size, size_unit = getFileSize(size)
+			var size, _= dirSize(filePath)
+			floatSize, sizeUnit = getFileSize(size)
 		}
-		fmt.Printf("%.1f%s\t%s\n", float_size, size_unit, file_path)
+		fmt.Printf("%.1f%s\t%s\n", floatSize, sizeUnit, filePath)
 	}
 }
 
 func dirSize(path string) (int64, error) {
 	var mu sync.Mutex
-	var size int64 = 0
+	var size int64
 	err := fastWalk(path, func(path string, typ os.FileMode) error {
 		mu.Lock()
 		defer mu.Unlock()
@@ -54,19 +53,19 @@ func dirSize(path string) (int64, error) {
 }
 
 func getFileSize(size int64)(float64, string){
-	var float_size float64 = float64(size)
-	var size_unit string = "B"
-	if(float_size > 1024) {
-			float_size = float_size / 1024
-			size_unit = "K"
+	var floatSize = float64(size)
+	var sizeUnit = "B"
+	if(floatSize > 1024) {
+			floatSize = floatSize / 1024
+			sizeUnit = "K"
 		}
-	if(float_size > 1024) {
-			float_size = float_size / 1024
-			size_unit = "M"
+	if(floatSize > 1024) {
+			floatSize = floatSize / 1024
+			sizeUnit = "M"
 		}
-	if(float_size > 1024) {
-			float_size = float_size / 1024
-			size_unit = "G"
+	if(floatSize > 1024) {
+			floatSize = floatSize / 1024
+			sizeUnit = "G"
 		}
-	return float_size, size_unit
+	return floatSize, sizeUnit
 }
