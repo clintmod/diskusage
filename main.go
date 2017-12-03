@@ -5,11 +5,58 @@ import (
 	"os"
 	"io/ioutil"
 	"log"
-	"path/filepath"
+	"sort"
+	"crypto/md5"
+	"io"
+	"runtime"
+	"github.com/stretchr/powerwalk"
 )
 
 func main() {
-	dirList(os.Args[1])
+	var cpus = 2//runtime.NumCPU()
+	fmt.Println(cpus)
+	runtime.GOMAXPROCS(cpus)
+	var path = os.Args[1]
+	dirList(path)
+	//dirList2(path)
+	/*if b, err := ComputeMd5(path); err != nil {
+		fmt.Printf("Error: %v", err)
+	} else {
+		fmt.Printf("%x", b)
+	}*/
+}
+
+func ComputeMd5(filePath string) ([]byte, error) {
+	var result []byte
+	file, err := os.Open(filePath)
+	if err != nil {
+		return result, err
+	}
+	defer file.Close()
+
+	hash := md5.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return result, err
+	}
+
+	return hash.Sum(result), nil
+}
+
+func dirList2(path string) {
+	var file, err = os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var names, _ = file.Readdirnames(0)
+	sort.Strings(names)
+	for _, name := range names {
+		var info, error = os.Lstat(path + "/" + name)
+		if error != nil {
+			log.Fatal(error)
+		}
+		var float_size, size_unit = getFileSize(info.Size())
+		fmt.Printf("name: %s, size: %.2f %v\n", name, float_size, size_unit)
+	}
 }
 
 func dirList(path string) {
@@ -33,7 +80,7 @@ func dirList(path string) {
 func dirSize(path string)(int64, int64) {
 	var size int64
 	var file_count int64
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+	err := powerwalk.Walk(path, func(_ string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			size += info.Size()
 			file_count++
