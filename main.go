@@ -5,10 +5,12 @@ import (
 	"os"
 	"io/ioutil"
 	"log"
-	"path/filepath"
+	"github.com/stretchr/powerwalk"
+	"runtime"
 )
 
 func main() {
+	runtime.GOMAXPROCS(2)
 	dirList(os.Args[1])
 }
 
@@ -33,7 +35,7 @@ func dirList(path string) {
 func dirSize(path string)(int64, int64) {
 	var size int64
 	var file_count int64
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+	err := powerwalk.Walk(path, func(_ string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			size += info.Size()
 			file_count++
