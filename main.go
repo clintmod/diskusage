@@ -31,7 +31,7 @@ func dirList(path string) {
 			var size, _= dirSize(file_path)
 			float_size, size_unit = getFileSize(size)
 		}
-		fmt.Printf("%.2f%s\t%s\n", float_size, size_unit, file_path)
+		fmt.Printf("%.1f%s\t%s\n", float_size, size_unit, file_path)
 	}
 }
 
