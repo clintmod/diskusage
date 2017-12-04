@@ -5,9 +5,21 @@ release:
     name: diskusage
   name_template: '{{.Tag}}'
 brew:
+  # Repository to push the tap to.
+  github:
+    owner: clintmod
+    name: homebrew-formulas
+  # Git author used to commit to the repository.
+  # Defaults are shown.
   commit_author:
-    name: goreleaserbot
-    email: goreleaser@carlosbecker.com
+    name: clintmod
+    email: cmodien@gmail.com
+  # Folder inside the repository to put the formula.
+  # Default is the root folder.
+  folder: "Formula"
+  # Your app's description.
+  # Default is empty.
+  description: "A utility you can use to examine disk usage. It's similar to the Unix du command."
   install: bin.install "diskusage"
 builds:
 - goos:
